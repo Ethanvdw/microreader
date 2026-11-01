@@ -17,7 +17,6 @@ struct BookIndexEntry {
   uint32_t last_open_order = 0;  // 0 = never opened; higher = more recently opened
 };
 
-static constexpr int MAX_BOOKS = 250;
 static constexpr uint32_t INDEX_FORMAT_VERSION = 2;
 
 class BookIndex {
@@ -41,7 +40,7 @@ class BookIndex {
   // bump; clear_entries() resets it to 0.
   uint64_t generation() const { return generation_; }
 
-  // Returns false (no-op) if MAX_BOOKS has been reached.
+  // Adds an entry to the in-memory index.
   bool add_entry(std::string_view path, std::string_view title, std::string_view author, uint32_t last_open_order = 0);
 
   // Updates in-memory entry only; call save() to persist.

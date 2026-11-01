@@ -361,6 +361,19 @@ TEST_F(BookIndexTest, LoadSave_RoundTrip) {
   EXPECT_EQ(e.last_open_order, 42u);
 }
 
+TEST_F(BookIndexTest, SupportsMoreThan250Entries) {
+  for (int i = 0; i < 300; ++i) {
+    const std::string path = "/sdcard/book_" + std::to_string(i) + ".epub";
+    ASSERT_TRUE(BookIndex::instance().add_entry(path, "Title", "Author"));
+  }
+  ASSERT_EQ(BookIndex::instance().entries().size(), 300u);
+  ASSERT_TRUE(BookIndex::instance().save(index_path_));
+
+  BookIndex::instance().clear_entries();
+  ASSERT_TRUE(BookIndex::instance().load(index_path_));
+  EXPECT_EQ(BookIndex::instance().entries().size(), 300u);
+}
+
 TEST_F(BookIndexTest, Load_MalformedSkipsBadLines) {
   write_file(index_path_,
              "/sdcard/books/a.epub|A|Au|0\n"

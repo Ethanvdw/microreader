@@ -48,8 +48,6 @@ bool BookIndex::is_book_path(const char* path) {
 
 bool BookIndex::add_entry(std::string_view path, std::string_view title, std::string_view author,
                           uint32_t last_open_order) {
-  if (static_cast<int>(entries_.size()) >= MAX_BOOKS)
-    return false;
   BookIndexEntry entry;
   entry.path = pool_.add(path);
   entry.title = pool_.add(title);
@@ -70,7 +68,7 @@ bool BookIndex::load(const std::string& index_file) {
   char line[1024];
   bool first_line = true;
   bool needs_rebuild = false;
-  while (std::fgets(line, sizeof(line), f) && static_cast<int>(entries_.size()) < MAX_BOOKS) {
+  while (std::fgets(line, sizeof(line), f)) {
     if (first_line) {
       first_line = false;
       if (std::strncmp(line, "#microreader-index v", 20) == 0) {
@@ -233,8 +231,6 @@ void BookIndex::build_index(const std::string& root_dir, DrawBuffer& buf) {
 
   // Helper to process a single epub path (keeps peak memory low)
   auto process_path = [&](const std::string& path) {
-    if (static_cast<int>(entries_.size()) >= MAX_BOOKS)
-      return;
     buf.show_loading("Indexing...", total > 0 ? 10 + (done * 90 / total) : 10);
     book.close();
     if (book.open(path.c_str(), buf.scratch_buf1(), buf.scratch_buf2(), false) == EpubError::Ok) {
